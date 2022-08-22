@@ -27,4 +27,6 @@ class AttachedFile(models.Model):
     def __str__(self):
         return self.file.name + ' - ' + self.broadcast.title
 
-# class Tag
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
