@@ -11,6 +11,7 @@ class Broadcast(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    tags = models.ManyToManyField('Tag', blank=True)
 
     def __str__(self):
         return self.title
@@ -20,7 +21,7 @@ class AttachedFile(models.Model):
     """
     Attached file model
     """
-    broadcast = models.ForeignKey(Broadcast, on_delete=models.CASCADE)
+    broadcast = models.ForeignKey(Broadcast, on_delete=models.CASCADE, related_name='attached_files')
     file = models.FileField(upload_to=upload_broadcast)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -29,4 +30,8 @@ class AttachedFile(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50)
+    title = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
