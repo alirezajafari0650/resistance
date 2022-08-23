@@ -23,3 +23,6 @@ class BroadcastSerializer(WritableNestedModelSerializer):
     class Meta:
         model = Broadcast
         fields = ['id', 'title', 'description', 'created_at', 'updated_at', 'tags', 'attached_files']
+
+
+
