@@ -1,36 +1,29 @@
-from djongo import models
-from broadcast.utils import upload_broadcast
+# from djongo import models
+# from django.db import models
+from datetime import datetime
+
+from mongoengine import connect, Document, fields
+
+from utils import upload_broadcast
+
+connect('local')
 
 
-class Broadcast(models.Model):
-    """
-    Broadcast model
-    """
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField('Tag', blank=True)
+class Broadcast(Document):
+    title = fields.StringField(max_length=100, required=True)
+    description = fields.StringField(max_length=1000, required=True)
+    attached_files = fields.ListField(fields.FileField(upload_to=upload_broadcast), required=False)
+    created_at = fields.DateTimeField(default=datetime.now)
+    tags = fields.ListField(fields.StringField(max_length=100))
 
-    def __str__(self):
-        return self.title
-
-
-class AttachedFile(models.Model):
-    """
-    Attached file model
-    """
-    broadcast = models.ForeignKey(Broadcast, on_delete=models.CASCADE, related_name='attached_files')
-    file = models.FileField(upload_to=upload_broadcast)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.file.name + ' - ' + self.broadcast.title
-
-
-class Tag(models.Model):
-    title = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
+    meta = {
+        'ordering': ['-created_at'],
+        'indexes': [
+            {'fields': ['$title', '$description', '$tags'],
+             'weights': {'tags': 10, 'title': 5, 'description': 1}
+             }
+        ]
+    }
 
     def __str__(self):
         return self.title

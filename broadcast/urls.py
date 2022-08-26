@@ -1,8 +1,9 @@
-from rest_framework.routers import DefaultRouter
+from rest_framework_mongoengine import routers
 
-from broadcast.api.views import BroadcastViewSet, AttachedFileViewSet
+from broadcast.api.views import BroadcastViewSet
 
-router = DefaultRouter()
-router.register(r'broadcasts', BroadcastViewSet)
-router.register(r'attachedfiles', AttachedFileViewSet)
+router = routers.DefaultRouter()
+router.register(r'broadcasts', BroadcastViewSet, basename='broadcast')
 urlpatterns = router.urls
+
+# urlpatterns += [path('test/', test, name='test')]
