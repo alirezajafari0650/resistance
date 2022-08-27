@@ -1,0 +1,15 @@
+/.env
+/.idea
+media/
+*.mp4
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*/__pychache__/
+migrations/__pychache__/
+__pychache__/
+__pychache__/*
+*.pyc
+

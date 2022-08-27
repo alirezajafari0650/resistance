@@ -1,20 +1,22 @@
-# from djongo import models
-# from django.db import models
 from datetime import datetime
 
+from djongo import models
 from mongoengine import connect, Document, fields
 
-from utils import upload_broadcast
-
 connect('local')
+
+
+class File(models.Model):
+    file = models.FileField(upload_to='files/')
 
 
 class Broadcast(Document):
     title = fields.StringField(max_length=100, required=True)
     description = fields.StringField(max_length=1000, required=True)
-    attached_files = fields.ListField(fields.FileField(upload_to=upload_broadcast), required=False)
+    attached_files = fields.ListField(fields.URLField())
     created_at = fields.DateTimeField(default=datetime.now)
     tags = fields.ListField(fields.StringField(max_length=100))
+    is_story = fields.BooleanField(default=False)
 
     meta = {
         'ordering': ['-created_at'],
