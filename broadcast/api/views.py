@@ -5,7 +5,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
-
+from rest_framework.parsers import MultiPartParser, FormParser,FileUploadParser
 from broadcast.api.serializers import BroadcastSerializer, SearchSerializer, FileSerializer
 from broadcast.models import Broadcast
 from utils import number_and_size, get_response
@@ -24,13 +24,15 @@ class BroadcastViewSet(viewsets.ModelViewSet):
         file = request.FILES.getlist('attached_files')
         print(file)
         urls = []
+        base_url = self.request.build_absolute_uri('/')
         for f in file:
             data = {'file': f}
             serializer = FileSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             file_url = serializer.data['file']
-            urls.append("http://127.0.0.1:8000" + file_url)
+
+            urls.append(base_url + file_url)
         data = {
             'title': request.data['title'],
             'description': request.data['description'],
@@ -42,6 +44,31 @@ class BroadcastViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        files = request.FILES.getlist('attached_files')
+        urls = []
+        base_url = self.request.build_absolute_uri('/')
+        for f in files:
+            data = {'file': f}
+            serializer = FileSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            file_url = serializer.data['file']
+
+            urls.append(base_url + file_url)
+        data = {
+            'title': request.data['title'],
+            'description': request.data['description'],
+            'attached_files': urls,
+            'tags': request.data.getlist('tags')
+        }
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
     def paginate_queryset(self, queryset):
         page_number, page_size = number_and_size(self.request)
@@ -69,35 +96,3 @@ class BroadcastViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data, count=queryset.count())
 
 
-def test(request):
-    broadcast_csv = open('/mnt/work/project/resistance/csv/broadcast_broadcast.csv')
-    tag_csv = open('/mnt/work/project/resistance/csv/broadcast_tag.csv')
-    b = broadcast_csv.readlines()
-    t = tag_csv.readlines()
-    tags = []
-    c = 0
-    for tag in t:
-        try:
-            tag = tag.split(',')[2]
-            if 100 > len(tag) > 0:
-                tags.append(tag)
-            # tags.append(tag)
-        except:
-            print(tag)
-    print(tags)
-    for item in b:
-        c += 1
-        # try:
-        title = item.split(',')[4]
-        if len(title) > 100:
-            title = title[:100]
-        description = item.split(',')[2]
-        if len(description) > 100:
-            description = description[:100]
-
-        tags_b = random.sample(tags, random.randint(5, 15))
-        Broadcast.objects.create(title=title, description=description, tags=tags_b)
-        # except:
-        #     print('error in line {}'.format(c))
-        print(c)
-    return HttpResponse('done')

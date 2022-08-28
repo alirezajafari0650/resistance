@@ -99,11 +99,11 @@ def get_response(instance, serialized_data, count):
         url = [url, '']
         number = 1
         if '?' not in url[0]:
-            url[0] = '?' + url[0]
+            url[0] = url[0]+'?'
 
-    next = url[0] + 'page=' + str(number + 1) + url[1][1:]
+    next = url[0] + '&page=' + str(number + 1) + url[1][1:]
     if number > 1:
-        previous = url[0] + 'page=' + str(number - 1) + url[1][1:]
+        previous = url[0] + '&page=' + str(number - 1) + url[1][1:]
     else:
         previous = None
     data = {
