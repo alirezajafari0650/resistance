@@ -36,7 +36,15 @@ pip install -r requirements.txt
 After installing all of the requirements, you should check the database .I use Mongodb in this project.The db name I use is 'local'. Please create this database.
 
 ## Running Django
-First you should migrate your database.(make sure the virtual environment is active)
+First of all, you should add the .env file to the project directory. This file contains a secret key . It looks like this:
+```bash
+.
+.
+SECRET_KEY = 'something'
+.
+.
+```
+After adding .env you should migrate your database.(make sure the virtual environment is active)
 ```bash
 python manage.py makemigrations && python manage.py migrate
 ```
